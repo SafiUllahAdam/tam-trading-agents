@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trading Mastery Dashboard</title>
+<meta name="description" content="Trading sessions, trade planner, personal rules and three live agents that check every setup against them.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='6' fill='%231f4fd8'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--ink:#15181d;--muted:#6b7280;--line:#e5e7eb;--soft:#f0f2f5;--accent:#1f4fd8;--accent-soft:#e8eefc;--green:#1a9a5a;--green-soft:#e4f5ec;--red:#d33b3b;--red-soft:#fcebeb;--amber:#b7791f;--amber-soft:#fdf3df;--mono:'JetBrains Mono',ui-monospace,Menlo,monospace;--r:12px;--sh:0 1px 2px rgba(16,24,40,.05)}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased}
+button{font:inherit;cursor:pointer}
+input,select{font:inherit;color:var(--ink)}
+.wrap{max-width:1080px;margin:0 auto;padding:16px}
+header{position:sticky;top:0;z-index:20;background:rgba(246,247,249,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:10px 0}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:15px}
+.brand .dot{width:10px;height:10px;border-radius:50%;background:var(--accent)}
+.paris{font-family:var(--mono);font-size:13px;color:var(--muted)}
+.paris b{color:var(--ink);font-size:17px;font-weight:600}
+nav{display:flex;gap:4px;flex-wrap:wrap}
+nav button{border:0;background:transparent;padding:8px 12px;border-radius:8px;color:var(--muted);font-weight:500}
+nav button.active{background:var(--card);color:var(--ink);box-shadow:var(--sh);border:1px solid var(--line)}
+.tab{display:none}.tab.active{display:block}
+.grid{display:grid;gap:12px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;box-shadow:var(--sh)}
+.card h2{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin:0 0 10px;font-weight:600}
+.card h3{font-size:14px;margin:0 0 4px;font-weight:600}
+.muted{color:var(--muted)}.small{font-size:12px}.mono{font-family:var(--mono)}
+p{margin:0}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:600}
+.pill.open,.pill.ok{background:var(--green-soft);color:var(--green)}.pill.closed{background:var(--soft);color:var(--muted)}.pill.soon{background:var(--amber-soft);color:var(--amber)}.pill.info{background:var(--accent-soft);color:var(--accent)}.pill.bad{background:var(--red-soft);color:var(--red)}
+.sess{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+.sess:first-child{border-top:0}
+.sess .t{font-family:var(--mono);font-size:22px;font-weight:600}
+.sess .n{font-weight:600}.sess .sub{font-size:12px;color:var(--muted)}
+.tl-row{display:grid;grid-template-columns:90px 1fr;align-items:center;gap:8px;margin:6px 0}
+.tl-track{position:relative;height:16px;background:var(--soft);border-radius:6px}
+.tl-track>i{position:absolute;top:3px;bottom:3px;border-radius:4px;background:var(--accent);opacity:.3}
+.tl-track>i.on{opacity:.95}
+.tl-now{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--red)}
+.tl-hours{display:grid;grid-template-columns:90px 1fr;gap:8px;font-size:10px;color:var(--muted);font-family:var(--mono)}
+.tl-hours>div:last-child{display:flex;justify-content:space-between}
+.rule{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-top:1px solid var(--line)}
+.rule:first-child{border-top:0}
+.rule .ic{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex:none}
+.rule.pass .ic{background:var(--green-soft);color:var(--green)}.rule.fail .ic{background:var(--red-soft);color:var(--red)}.rule.warn .ic{background:var(--amber-soft);color:var(--amber)}.rule.wait .ic{background:var(--soft);color:var(--muted)}
+.rule b{font-weight:600}.rule .why{font-size:12px;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{padding:4px 9px;border-radius:8px;background:var(--soft);font-family:var(--mono);font-size:12px;font-weight:600;cursor:pointer}
+.chip.hot{background:var(--accent-soft);color:var(--accent)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:left;padding:8px;border-top:1px solid var(--line);vertical-align:top}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);font-weight:600;border-top:0}
+.form{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
+.f{display:flex;flex-direction:column;gap:4px}
+.f label{font-size:11px;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);font-weight:600}
+.f input,.f select{border:1px solid var(--line);border-radius:8px;padding:9px 10px;background:#fff;width:100%}
+.f input:focus,.f select:focus{outline:2px solid var(--accent-soft);border-color:var(--accent)}
+.f .hint{font-size:11px;color:var(--muted)}
+.seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{flex:1;border:0;background:#fff;padding:9px;color:var(--muted);font-weight:600}
+.seg button.buy.active{background:var(--green-soft);color:var(--green)}.seg button.sell.active{background:var(--red-soft);color:var(--red)}
+.step{display:flex;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.step:first-child{border-top:0}
+.step input{margin-top:3px;width:18px;height:18px;accent-color:var(--accent);flex:none}
+.step .how{font-size:12.5px;color:#374151;margin-top:3px}
+.step .how b{color:var(--ink)}
+.more{margin-top:6px}.more summary{font-size:12px;color:var(--accent);cursor:pointer;list-style:none;font-weight:500}.more summary::-webkit-details-marker{display:none}.more p{font-size:12.5px;color:#374151;margin:6px 0 0;padding:8px 10px;background:var(--soft);border-radius:8px}
+.btn{border:1px solid var(--line);background:#fff;border-radius:8px;padding:8px 14px;font-weight:600;color:var(--ink)}
+.btn:hover{background:var(--soft)}.btn.sm{padding:5px 10px;font-size:12px}
+.btn.red{background:var(--red-soft);border-color:#f3c5c5;color:var(--red)}
+.stat .v{font-family:var(--mono);font-size:24px;font-weight:600}.stat .l{font-size:12px;color:var(--muted)}
+.verdict{border-radius:var(--r);padding:14px 16px}
+.verdict.take{background:var(--green-soft);border:1px solid #bfe6d0}.verdict.skip{background:var(--red-soft);border:1px solid #f3c5c5}.verdict.care{background:var(--amber-soft);border:1px solid #f1dcb3}.verdict.wait{background:var(--soft);border:1px solid var(--line)}
+.verdict .big{font-size:20px;font-weight:700}
+.note{background:var(--amber-soft);border:1px solid #f1dcb3;border-radius:10px;padding:10px 12px;font-size:13px}
+.footer{color:var(--muted);font-size:12px;text-align:center;padding:24px 0 8px}
+.hidden{display:none}
+.sr{display:grid;grid-template-columns:40px 1fr 56px;gap:8px;align-items:center;font-size:12.5px;padding:3px 0}
+.sr .bw{position:relative;height:10px;background:var(--soft);border-radius:4px;overflow:hidden}
+.sr .bw i{position:absolute;top:0;bottom:0;border-radius:4px}
+.sr .bw i.g{background:var(--green)}.sr .bw i.r{background:var(--red)}
+.sr .v{font-family:var(--mono);text-align:right}
+.nw{font-size:12.5px;padding:4px 0;border-top:1px solid var(--line);display:flex;gap:8px}
+.nw:first-child{border-top:0}
+.nw .t{font-family:var(--mono);min-width:44px}
+.pi{display:flex;gap:8px;align-items:flex-start;padding:6px 0;font-size:13px;border-top:1px solid var(--line)}.pi:first-child{border-top:0}.pi i{width:9px;height:9px;border-radius:50%;flex:none;margin-top:5px}.pi.g i{background:var(--green)}.pi.r i{background:var(--red)}.pi.n i{background:#b4b2a9}.pi.g b{color:var(--green)}.pi.r b{color:var(--red)}.pi a{color:var(--accent)}
+/* ---------- agents ---------- */
+.agent{display:flex;gap:12px;align-items:flex-start}
+.agent .av{width:36px;height:36px;border-radius:10px;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:600;font-family:var(--mono);flex:none}
+.agent .nm{font-weight:600;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.agent .ln{font-size:12.5px;color:#374151;margin-top:3px}
+.setrow{display:grid;grid-template-columns:110px 1fr;gap:10px;align-items:start;padding:8px 0;border-top:1px solid var(--line)}
+.setrow:first-of-type{border-top:0}
+.setrow>span{font-size:11px;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);font-weight:600;padding-top:5px}
+.chip.on{background:var(--accent);color:#fff}
+.sig{display:grid;gap:12px;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr)}
+.sig .lv{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:10px;margin-top:10px}
+.sig .lv .v{font-family:var(--mono);font-size:16px;font-weight:600}.sig .lv .l{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.03em}
+.acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}.btn.pri:hover{background:#1a43b8}
+.wrow{border-top:1px solid var(--line);padding:10px 0}.wrow:first-child{border-top:0}
+.wrow summary{list-style:none;cursor:pointer;display:flex;gap:10px;align-items:flex-start;justify-content:space-between}
+.wrow summary::-webkit-details-marker{display:none}
+.wrow .hd{font-weight:600;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.wrow .sub{font-size:12.5px;color:#374151;margin-top:2px}
+#board td:nth-child(-n+4){white-space:nowrap}
+#board tr.ev td{background:var(--soft);white-space:normal;padding:14px}
+#board tr.ev h3{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+#board tr.ev .rule{padding:6px 0}
+.dir{font-family:var(--mono);font-size:11px;font-weight:600;padding:1px 7px;border-radius:6px}
+.dir.BUY{background:var(--green-soft);color:var(--green)}.dir.SELL{background:var(--red-soft);color:var(--red)}
+.log{font-family:var(--mono);font-size:12px;max-height:260px;overflow:auto}
+.log div{padding:3px 0;border-top:1px solid var(--line);display:grid;grid-template-columns:48px 78px 1fr;gap:8px}
+.log div:first-child{border-top:0}.log .a{color:var(--accent)}
+.chart{position:relative;margin-top:10px}
+.chart svg{display:block;width:100%;height:auto}
+.chart .tip{position:absolute;top:4px;pointer-events:none;background:var(--ink);color:#fff;border-radius:8px;padding:5px 8px;font-size:11px;font-family:var(--mono);white-space:nowrap;display:none}
+.aic{font-size:12px;margin-top:4px;display:flex;gap:6px;align-items:flex-start}
+.aic i{width:8px;height:8px;border-radius:50%;flex:none;margin-top:5px;background:#b4b2a9}
+.aic.pass i{background:var(--green)}.aic.fail i{background:var(--red)}.aic.warn i{background:var(--amber)}
+.aic span{color:#374151}
+.ai{background:var(--accent-soft);border-radius:10px;padding:10px 12px;font-size:13px;margin-top:10px}
+.ai h4{margin:0 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--accent)}
+@media (max-width:760px){.sig{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:640px){.sess .t{font-size:18px}.tl-row,.tl-hours{grid-template-columns:70px 1fr}.setrow{grid-template-columns:1fr}.log div{grid-template-columns:44px 1fr}.log .a{display:none}}
+</style>
+</head>
+<body>
+<header><div class="wrap topbar">
+  <div class="brand"><span class="dot"></span>Trading Mastery</div>
+  <nav id="nav"><button data-tab="home" class="active">Home</button><button data-tab="agents">Agents <span id="navBadge"></span></button><button data-tab="sessions">Sessions &amp; Pairs</button><button data-tab="planner">Trade Planner</button><button data-tab="rules">Rules</button></nav>
+  <div class="paris">Paris <b id="parisClock">--:--:--</b> <span id="parisDate"></span> · MT4 <span id="mt4Clock"></span></div>
+</div></header>
+
+<main class="wrap">
+
+<!-- HOME -->
+<section id="tab-home" class="tab active">
+  <div class="grid g2">
+    <div class="card">
+      <h2>Market sessions · Paris time</h2>
+      <div id="sessionList"></div>
+      <div id="timeline" style="margin-top:8px"></div>
+      <div class="tl-hours"><div></div><div><span>00</span><span>03</span><span>06</span><span>09</span><span>12</span><span>15</span><span>18</span><span>21</span><span>24</span></div></div>
+      <p class="small muted" style="margin-top:8px">Red line = now. Busiest window: London + New York overlap, <b>14:00–18:00 Paris</b>.</p>
+    </div>
+    <div class="grid" style="align-content:start">
+      <div class="card">
+        <h2>Agents <span id="homeAgentPill" class="pill info" style="margin-left:6px">starting…</span></h2>
+        <div id="homeAgents"></div>
+      </div>
+      <div class="card">
+        <h2>Can I trade right now?</h2>
+        <div id="todayRules"></div>
+        <div style="display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap">
+          <button class="btn red sm" id="hitSl">I hit a stop-loss</button>
+          <button class="btn sm" id="undoSl">Undo</button>
+          <span class="small muted">Press after each stop-loss. Resets at midnight.</span>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Currency strength · this week <span id="liveBadge" class="pill info" style="margin-left:6px">loading…</span></h2>
+        <div id="strength"></div>
+        <div id="newsToday" style="margin-top:10px"></div>
+      </div>
+      <div class="card">
+        <h2>Best instruments right now</h2>
+        <div id="bestNow" class="chips"></div>
+        <p class="small muted" style="margin-top:8px" id="bestNowWhy"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AGENTS -->
+<section id="tab-agents" class="tab">
+  <div class="grid g3" id="agentCards"></div>
+  <div id="signals" class="grid" style="margin-top:12px"></div>
+  <div class="card" style="margin-top:12px">
+    <h2>Forming setups · not ready yet</h2>
+    <div id="watchList"></div>
+  </div>
+  <div class="grid g2" style="margin-top:12px">
+    <div class="card">
+      <h2>Open trades</h2>
+      <div id="openTrades"></div>
+    </div>
+    <div class="card">
+      <h2>Agent log</h2>
+      <div id="agentLog" class="log"></div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:12px">
+    <h2>Market board · click a row to see the proof</h2>
+    <div style="overflow:auto"><table id="board"><thead><tr><th>Symbol</th><th>Charts</th><th>Direction</th><th>Status</th><th>What the agents see</th></tr></thead><tbody></tbody></table></div>
+  </div>
+  <div class="card" style="margin-top:12px">
+    <h2>What the agents watch</h2>
+    <div class="setrow"><span>Markets</span><div class="chips" id="cfgGroups"></div></div>
+    <div class="setrow"><span>Entry charts</span><div><div class="chips" id="cfgModes"></div><p class="small muted" style="margin-top:6px">Direction always comes from the bigger chart: M15 → H1, H1 → H4, H4 → D1.</p></div></div>
+    <div class="setrow"><span>Alerts</span><div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn sm" id="btnNotify">Turn on browser alerts</button><button class="btn sm" id="btnSound">Sound: on</button></div>
+      <details class="more"><summary>Telegram alerts (optional)</summary>
+        <div class="form" style="margin-top:8px">
+          <div class="f"><label>Bot token</label><input id="tgToken" type="password" autocomplete="off" placeholder="123456:ABC…"></div>
+          <div class="f"><label>Chat ID</label><input id="tgChat" autocomplete="off" placeholder="123456789"></div>
+          <div class="f"><label>&nbsp;</label><button class="btn" id="tgTest">Send test</button></div>
+        </div>
+        <p id="tgMsg" style="margin-top:8px">Create a bot with @BotFather, send it one message, then paste the token and your chat ID. Both stay in this browser only. Alerts are sent while this page is open.</p>
+      </details>
+    </div></div>
+    <div class="setrow"><span>AI analyst</span><div id="aiStatus" class="small" style="padding-top:4px">Checking…</div></div>
+  </div>
+</section>
+
+<!-- SESSIONS -->
+<section id="tab-sessions" class="tab">
+  <div class="card" style="margin-bottom:12px"><p>Each currency moves most when its own country is awake. More traders = cleaner trends and smaller spreads. Trade a pair during its home session.</p></div>
+  <div class="grid g2" id="sessionCards"></div>
+  <div class="card" style="margin-top:12px">
+    <h2>Instrument guide</h2>
+    <div style="overflow:auto"><table id="instTable"><thead><tr><th>Symbol</th><th>Best session</th><th>Character</th></tr></thead><tbody></tbody></table></div>
+  </div>
+</section>
+
+<!-- PLANNER -->
+<section id="tab-planner" class="tab">
+  <div class="grid g2" style="grid-template-columns:minmax(0,1.1fr) minmax(0,1fr)">
+    <div class="grid" style="align-content:start">
+      <div class="card">
+        <h2>Trade</h2>
+        <div class="form">
+          <div class="f"><label>Account balance $</label><input id="balance" type="number" step="1" min="0" placeholder="25000"></div>
+          <div class="f"><label>Instrument</label><select id="pInst"></select></div>
+          <div class="f"><label>Direction</label><div class="seg"><button class="buy active" data-dir="BUY">BUY</button><button class="sell" data-dir="SELL">SELL</button></div></div>
+          <div class="f"><label>Entry chart</label><select id="pEtf"><option>M5</option><option>M15</option><option>M30</option><option selected>H1</option><option>H4</option><option>D1</option></select><span class="hint" id="riskHint"></span></div>
+          <div class="f"><label>Entry price</label><input id="pEntry" type="number" step="any" placeholder="1.08500"></div>
+          <div class="f"><label>Stop-loss price</label><input id="pSl" type="number" step="any" placeholder="1.08250"></div>
+          <div class="f"><label>Take-profit price</label><input id="pTp" type="number" step="any" placeholder="1.09250"><span class="hint" id="tpSuggest"></span></div>
+        </div>
+        <div id="pairInfo" style="margin-top:12px"></div>
+      </div>
+      <div class="card">
+        <h2>Checklist · tick each one honestly</h2>
+        <div id="checklist"></div>
+      </div>
+    </div>
+    <div class="grid" style="align-content:start">
+      <div class="card">
+        <h2>Your numbers</h2>
+        <div class="grid g3" id="calcOut"></div>
+        <p class="small muted" style="margin-top:10px" id="calcFormula"></p>
+      </div>
+      <div id="verdict" class="verdict hidden"></div>
+      <div class="card">
+        <h2>Rule check</h2>
+        <div id="ruleCheck"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RULES -->
+<section id="tab-rules" class="tab">
+  <div class="grid g2">
+    <div class="card">
+      <h2>My 3 rules</h2>
+      <div class="rule pass"><div class="ic">1</div><div><b>Time.</b> Short-chart trades (M5–M30) closed by 22:00 Paris. Everything closed by Friday 21:00.<div class="why">Late evening and weekends: thin market, wide spreads, gaps through stops.</div></div></div>
+      <div class="rule pass"><div class="ic">2</div><div><b>Losses.</b> 1 stop-loss → 60-min break. 2 stop-losses → done for the day. No two trades on the same currency. Never bigger size after a loss.<div class="why">Stops revenge trading and doubling risk on one idea.</div></div></div>
+      <div class="rule pass"><div class="ic">3</div><div><b>Size.</b> Risk % from the table (max 2%, D1 only). Max 3% open at once. Take-profit at least 1 × stop-loss (1:1).<div class="why">The stop distance decides the lot size — never the other way round.</div></div></div>
+    </div>
+    <div class="card">
+      <h2>Risk per chart</h2>
+      <table><thead><tr><th>Entry chart</th><th>Risk</th><th>Target (1:1)</th></tr></thead><tbody>
+        <tr><td>M5</td><td class="mono">0.25%</td><td class="mono">0.25%</td></tr>
+        <tr><td>M15</td><td class="mono">0.35%</td><td class="mono">0.35%</td></tr>
+        <tr><td>M30</td><td class="mono">0.45%</td><td class="mono">0.45%</td></tr>
+        <tr><td>H1</td><td class="mono">0.60%</td><td class="mono">0.60%</td></tr>
+        <tr><td>H1 · NAS100</td><td class="mono">0.50%</td><td class="mono">0.50%</td></tr>
+        <tr><td>H4</td><td class="mono">1.00%</td><td class="mono">1.00%</td></tr>
+        <tr><td>D1</td><td class="mono">2.00%</td><td class="mono">2.00%</td></tr>
+      </tbody></table>
+      <p class="small muted" style="margin-top:8px">Smaller chart = more noise = smaller risk.</p>
+    </div>
+    <div class="card">
+      <h2>Two chart views</h2>
+      <p><b>Heikin Ashi</b> (smoothed candles) → only for direction: colour and Alligator.</p>
+      <p style="margin-top:4px"><b>Normal candles</b> → for all prices: entry, stop-loss, take-profit, levels.</p>
+      <p class="small muted" style="margin-top:6px">Bigger chart gives the direction. Entry chart gives the moment. Never change chart in the middle of a trade.</p>
+    </div>
+    <div class="card">
+      <h2>Mistakes to name</h2>
+      <table><tbody>
+        <tr><td><b>FOMO</b></td><td class="muted">Jumping in late. Missed trade = no trade.</td></tr>
+        <tr><td><b>Revenge</b></td><td class="muted">Trading right after a loss. Take the break.</td></tr>
+        <tr><td><b>Greed</b></td><td class="muted">Removing TP or adding size. Keep the plan.</td></tr>
+        <tr><td><b>SL moved</b></td><td class="muted">Never move a stop further away.</td></tr>
+        <tr><td><b>No confirmation</b></td><td class="muted">Entering before the candle closes.</td></tr>
+      </tbody></table>
+    </div>
+    <div class="card" style="grid-column:1/-1">
+      <h2>How the three agents work</h2>
+      <div class="rule pass"><div class="ic">1</div><div><b>Scout</b> reads the live charts once a minute: candles, Heikin Ashi colour, Alligator, peaks and dips, currency strength and red news.<div class="why">Free delayed-by-seconds feed. Prices can differ slightly from your MT4 broker.</div></div></div>
+      <div class="rule pass"><div class="ic">2</div><div><b>Strategist</b> applies the checklist to every instrument: bigger chart direction, price structure, entry chart colour, candle close past the last peak or dip, stop beyond the last dip or peak.<div class="why">It only says "ready" on the first finished candle past the level. Two candles past = missed.</div></div></div>
+      <div class="rule pass"><div class="ic">3</div><div><b>Risk Guard</b> checks the setup against My 3 rules, the session, strong vs weak, red news and your open trades, then sizes the lot from your balance.<div class="why">It runs in this browser. Balance, stop-loss count and trades are never uploaded.</div></div></div>
+      <p class="small muted" style="margin-top:8px">The agents suggest. You decide, on your own chart, and only when the last checklist step (Calm) is true.</p>
+    </div>
+  </div>
+</section>
+
+<div class="footer">Demo first · nothing here is financial advice</div>
+</main>
+
+<script type="module" src="/app.js"></script>
+</body>
+</html>
